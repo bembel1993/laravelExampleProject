@@ -25,13 +25,12 @@ class LoginController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function login(LoginRequest $request)
+    /*public function login(LoginRequest $request)
     {
         $credentials = $request->getCredentials();
 
         if(!Auth::validate($credentials)):
-            return redirect()->to('login')
-                ->withErrors(trans('auth.failed'));
+            return redirect()->to('login')->withErrors(trans('auth.failed'));
         endif;
 
         $user = Auth::getProvider()->retrieveByCredentials($credentials);
@@ -39,6 +38,20 @@ class LoginController extends Controller
         Auth::login($user);
 
         return $this->authenticated($request, $user);
+
+    }*/
+    public function login(Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+        if (Auth::attempt($credentials)) {
+           
+            return redirect()->intended('/index');
+        }
+
+        return redirect()->back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ]);
     }
 
     /**
@@ -49,7 +62,7 @@ class LoginController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    protected function authenticated(Request $request, $user) 
+    protected function authenticated(Request $request, $user)
     {
         return redirect()->intended();
     }
